@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Margarita 3D • model-viewer</title>
+
+  <!-- Importa el web component <model-viewer> desde CDN -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+
+  <style>
+    html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
+    model-viewer { width: 100%; height: 100%; background: #f6f7fb; }
+    #ar-button {
+      position: absolute; right: 16px; bottom: 16px;
+      padding: 10px 14px; border: 0; border-radius: 999px; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(0,0,0,.2); background: white; font-weight: 600;
+    }
+    /* Mensaje solo visible durante sesión AR con WebXR */
+    #ar-prompt { 
+      position: absolute; left: 50%; transform: translateX(-50%); bottom: 16px;
+      padding: 8px 12px; border-radius: 999px; background: white; 
+      box-shadow: 0 6px 24px rgba(0,0,0,.15); font-size: 14px; display: none;
+    }
+    model-viewer[ar-status="session-started"] ~ #ar-prompt { display: block; }
+  </style>
+</head>
+<body>
+
+  <model-viewer id="mv"
+    src="assets/peperoni.glb"
+    alt="Pizza peperoni 3D"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="fixed"
+    ar-placement="floor"
+    xr-environment>
+    <!-- Botón AR personalizado (solo aparece en dispositivos con AR) -->
+    <button slot="ar-button" id="ar-button">👀 la 🍕 en Realidad Aumentada </button>
+  </model-viewer>
+
+  <div id="ar-prompt">Mueve el teléfono para ayudar a detectar el piso…</div>
+
+</body>
+</html>
