@@ -9,45 +9,96 @@
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
 
+  <!-- (Opcional) Pre-carga del logo para evitar parpadeo -->
+  <link rel="preload" href="assets/logo-basiliko.png" as="image">
+
   <style>
     html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
-    model-viewer { width: 100%; height: 100%; background: #f6f7fb; }
+
+    /* Contenedor de la escena: crea un contexto para ubicar el logo encima */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f6f7fb; /* color de fondo general */
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      background: #f6f7fb; /* mantiene el fondo del visor */
+      display: block;
+    }
+
+    /* Botón AR (slot) */
     #ar-button {
       position: absolute; right: 16px; bottom: 16px;
       padding: 10px 14px; border: 0; border-radius: 999px; cursor: pointer;
       box-shadow: 0 6px 24px rgba(0,0,0,.2); background: white; font-weight: 600;
     }
-    /* Mensaje solo visible durante sesión AR con WebXR */
+
+    /* Mensaje contextual */
     #ar-prompt { 
       position: absolute; left: 50%; transform: translateX(-50%); bottom: 16px;
       padding: 8px 12px; border-radius: 999px; background: white; 
       box-shadow: 0 6px 24px rgba(0,0,0,.15); font-size: 14px; display: none;
     }
-    model-viewer[ar-status="session-started"] ~ #ar-prompt { display: block; }
+    model-viewer[ar-status="session-started"] ~ #ar-prompt,
+    model-viewer[ar-status="object-placed"] ~ #ar-prompt { display: block; }
+
+    /* ──────────────────────────────────────────────────────────────
+       Overlay del logo SIEMPRE visible en navegador
+       (no bloquea gestos de rotación/zoom)
+       ────────────────────────────────────────────────────────────── */
+    .brand-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      z-index: 10;
+      pointer-events: none;   /* no intercepta gestos del viewer */
+      user-select: none;
+    }
+    
+    .brand-badge img {
+    height: clamp(72px, 15.6vw, 114px); /* x2 respecto a 36px, 7.8vw, 57px */
+    border-radius: 8px;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+    display: block;
+  }
+
   </style>
 </head>
 <body>
 
-  <model-viewer id="mv"
-    src="assets/peperoni.glb"
-    alt="Pizza peperoni 3D"
-    camera-controls
-    disable-pan
-    auto-rotate
-    shadow-intensity="1"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    ar-scale="fixed"
-    ar-placement="floor"
-    camera-orbit="0deg 75deg 3m"
-    min-camera-orbit="auto 45deg auto"
-    max-camera-orbit="auto 90deg auto"
-    xr-environment>
-    <!-- Botón AR personalizado (solo aparece en dispositivos con AR) -->
-    <button slot="ar-button" id="ar-button">👀 la 🍕 en Realidad Aumentada </button>
-  </model-viewer>
+  <!-- Wrapper para superponer el logo sobre el model-viewer -->
+  <div class="stage">
+    <model-viewer id="mv"
+      src="assets/peperoni.glb"
+      alt="Pizza Peperoni 3D"
+      camera-controls
+      disable-pan
+      auto-rotate
+      shadow-intensity="1"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      ar-scale="fixed"
+      ar-placement="floor"
+      camera-orbit="0deg 75deg 3m"
+      min-camera-orbit="auto 45deg auto"
+      max-camera-orbit="auto 90deg auto"
+      xr-environment>
+      <!-- Botón AR personalizado (solo aparece en dispositivos con AR) -->
+      <button slot="ar-button" id="ar-button">👀 la 🍕 en Realidad Aumentada.</button>
+    </model-viewer>
 
-  <div id="ar-prompt">Mueve el teléfono para ayudar a detectar el piso…</div>
+    <!-- Overlay del logo (siempre visible en navegador) -->
+    <div class="brand-badge">
+      <img src="assets/logo-basiliko.png" alt="Basiliko" />
+    </div>
+
+    <!-- Mensaje contextual durante AR WebXR -->
+    <div id="ar-prompt">Mueve el teléfono para ayudar a detectar el piso…</div>
+  </div>
 
 </body>
 </html>
